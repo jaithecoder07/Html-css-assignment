@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Catch The Dot - Retro Arcade</title>
+
+<!-- Retro Font -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+  rel="stylesheet"
+/>
+
+<style>
+/* ---------------------------------------------------------------
+   🎨 RETRO ARCADE CSS
+-----------------------------------------------------------------*/
+:root {
+  --bg-top: #190024;
+  --bg-bottom: #04020d;
+  --grid-neon: rgba(255, 230, 0, 0.16);
+  --panel: rgba(18, 10, 30, 0.9);
+  --panel-dark: rgba(5, 7, 16, 0.95);
+  --ink: #d7fff9;
+  --accent-main: #ff2b78;
+  --accent-hot: #ff9a1f;
+  --accent-cool: #2affff;
+  --accent-lime: #95ff4b;
+  --tile: #1f2e4d;
+  --tile-stroke: #6ad2ff;
+  --danger: #ff5b74;
+  --ok: #75ff9a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  font-family: "Press Start 2P", cursive;
+  color: var(--ink);
+  background:
+    radial-gradient(circle at 50% 88%, rgba(255, 62, 137, 0.28) 0%, transparent 52%),
+    radial-gradient(circle at 12% 14%, rgba(0, 245, 255, 0.16) 0%, transparent 38%),
+    repeating-linear-gradient(-30deg,
+      rgba(255, 220, 63, 0.07) 0 16px,
+      rgba(255, 70, 140, 0.08) 16px 32px
+    ),
+    linear-gradient(180deg, var(--bg-top) 0%, #120625 45%, var(--bg-bottom) 100%);
+  overflow: hidden;
+  text-shadow: 0 0 6px rgba(0, 255, 249, 0.25);
+}
+
+#bgCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.36;
+}
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.screen {
+  min-height: 100vh;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(10px, 2vw, 18px);
+}
+
+.screen.active {
+  display: flex;
+}
+
+.card {
+  position: relative;
+  width: min(880px, 96vw);
+  border: 4px solid #ffe35f;
+  border-radius: 20px;
+  background:
+    linear-gradient(135deg,
+      rgba(255, 221, 78, 0.08),
+      rgba(255, 52, 180, 0.1)
+    ),
+    var(--panel);
+  padding: 26px;
+  text-align: center;
+  backdrop-filter: blur(2px);
+  box-shadow:
+    0 0 0 2px rgba(255, 40, 119, 0.75),
+    0 0 26px rgba(255, 225, 80, 0.25);
+}
+
+h1, h2 {
+  margin: 4px 0 16px;
+  color: #fff38b;
+  text-shadow:
+    -2px 0 #ff2b78,
+    2px 0 #2affff,
+    0 0 12px rgba(255, 228, 106, 0.6);
+  font-size: clamp(1.15rem, 2.6vw, 2rem);
+}
+
+.mode-picker {
+  margin: 14px auto;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.mode-chip, .level-chip {
+  background: linear-gradient(180deg, #2057a1, #102b59);
+  border: 2px solid #7fd7ff;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--ink);
+}
+
+.mode-chip.active, .level-chip.active {
+  background: linear-gradient(180deg, #ff4a88, #cf1f62);
+  border-color: #ffd46a;
+}
+
+button {
+  cursor: pointer;
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  font-family: inherit;
+  transition: 0.15s;
+}
+
+.action-btn {
+  background: linear-gradient(180deg, #ffef7a, #ff9d2c);
+  border-color: #fff1ab;
+  color: #3e1400;
+}
+
+.ghost-btn {
+  background: rgba(26, 54, 108, 0.9);
+  border-color: #7fd7ff;
+  color: var(--ink);
+}
+
+.board-svg {
+  width: min(100%, 1060px);
+  height: min(100%, 62vh);
+  display: block;
+  filter: drop-shadow(0 0 11px rgba(0, 255, 255, 0.22));
+}
+
+.cell {
+  fill: var(--tile);
+  stroke: var(--tile-stroke);
+  stroke-width: 2.5;
+  cursor: pointer;
+  transition: 0.15s;
+}
+
+.cell.blocker {
+  fill: var(--accent-hot);
+  stroke: #ffe29a;
+}
+
+.cell.dot {
+  fill: #ff376f;
+  stroke: #ffc2d3;
+}
+
+.message {
+  margin-top: 12px;
+  min-height: 30px;
+}
+
+.message.win {
+  color: var(--ok);
+}
+
+.message.lose {
+  color: var(--danger);
+}
+</style>
+</head>
+
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<main class="app-shell">
+
+<!-- START SCREEN -->
+<section id="startScreen" class="screen active">
+  <div class="card">
+    <h1>Catch The Dot</h1>
+    <p class="subtitle">Retro Trap Challenge</p>
+    <p>Select mode & level</p>
+
+    <div class="mode-picker" id="modePicker">
+      <button class="mode-chip active" data-mode="normal">Normal Mode</button>
+      <button class="mode-chip" data-mode="timed">Timed Mode</button>
+    </div>
+
+    <div class="level-picker" id="levelPicker"></div>
+
+    <button id="goToInstructionsBtn" class="action-btn">Play</button>
+  </div>
+</section>
+
+<!-- INSTRUCTION SCREEN -->
+<section id="instructionScreen" class="screen">
+  <div class="card">
+    <h2 id="instructionTitle">How To Play</h2>
+    <ul id="instructionList"></ul>
+    <p id="instructionHint"></p>
+
+    <button id="backToStartBtn" class="ghost-btn">Back</button>
+    <button id="startGameBtn" class="action-btn">Start Level</button>
+  </div>
+</section>
+
+<!-- GAME SCREEN -->
+<section id="gameScreen" class="screen">
+  <div class="card game-layout">
+    <h2>Game</h2>
+
+    <svg id="gameBoard" class="board-svg"></svg>
+
+    <p id="message" class="message"></p>
+
+    <div class="controls">
+      <button id="restartLevelBtn" class="ghost-btn">Restart</button>
+      <button id="nextLevelBtn" class="action-btn">Next Level</button>
+      <button id="menuBtn" class="ghost-btn">Menu</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<script>
+/* -------------------------------------------------------------
+   🎮 FULL GAME ENGINE (JS)
+--------------------------------------------------------------*/
+
+const LEVELS = [
+  { size: 7, randomBlockers: 14, time: 55, pulse: 1600 },
+  { size: 7, randomBlockers: 13, time: 53, pulse: 1560 },
+  { size: 8, randomBlockers: 15, time: 50, pulse: 1500 },
+  { size: 8, randomBlockers: 13, time: 48, pulse: 1450 },
+  { size: 9, randomBlockers: 14, time: 44, pulse: 1380 },
+  { size: 9, randomBlockers: 15, time: 42, pulse: 1320 },
+  { size: 10, randomBlockers: 16, time: 39, pulse: 1260 },
+  { size: 10, randomBlockers: 17, time: 36, pulse: 1200 },
+  { size: 11, randomBlockers: 19, time: 33, pulse: 1130 },
+  { size: 12, randomBlockers: 21, time: 30, pulse: 1060 },
+];
+
+const HINTS = [
+  "Hint: Build a wall in front of the dot.",
+  "Hint: Close nearby exits first.",
+  "Hint: Avoid long tunnels.",
+  "Hint: Think in rings.",
+  "Hint: Block future escape lanes.",
+  "Hint: Seal edges early.",
+  "Hint: Dot always finds openings.",
+  "Hint: Use diagonal walls.",
+  "Hint: Protect weak sides.",
+  "Hint: Final level: no openings allowed."
+];
+
+const CELL = { EMPTY: 0, BLOCKED: 1, DOT: 2 };
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+const startScreenEl = document.getElementById("startScreen");
+const instructionScreenEl = document.getElementById("instructionScreen");
+const gameScreenEl = document.getElementById("gameScreen");
+const levelPickerEl = document.getElementById("levelPicker");
+const modePickerEl = document.getElementById("modePicker");
+const instructionTitleEl = document.getElementById("instructionTitle");
+const instructionListEl = document.getElementById("instructionList");
+const instructionHintEl = document.getElementById("instructionHint");
+const goToInstructionsBtn = document.getElementById("goToInstructionsBtn");
+const backToStartBtn = document.getElementById("backToStartBtn");
+const startGameBtn = document.getElementById("startGameBtn");
+
+const boardEl = document.getElementById("gameBoard");
+const messageEl = document.getElementById("message");
+const restartLevelBtn = document.getElementById("restartLevelBtn");
+const nextLevelBtn = document.getElementById("nextLevelBtn");
+const menuBtn = document.getElementById("menuBtn");
+
+let state = {
+  selectedLevelIndex: 0,
+  selectedMode: "normal",
+  levelIndex: 0,
+  mode: "normal",
+  board: [],
+  size: 0,
+  dot: { row: 0, col: 0 },
+  moves: 0,
+  isGameOver: false,
+};
+
+function showScreen(name) {
+  startScreenEl.classList.remove("active");
+  instructionScreenEl.classList.remove("active");
+  gameScreenEl.classList.remove("active");
+
+  if (name === "start") startScreenEl.classList.add("active");
+  if (name === "instructions") instructionScreenEl.classList.add("active");
+  if (name === "game") gameScreenEl.classList.add("active");
+}
+
+function setupLevel(levelIndex) {
+  const level = LEVELS[levelIndex];
+  state.levelIndex = levelIndex;
+  state.mode = state.selectedMode;
+  state.size = level.size;
+  state.board = Array.from({ length: level.size }, () => Array(level.size).fill(CELL.EMPTY));
+
+  const c = Math.floor(level.size / 2);
+  state.dot = { row: c, col: c };
+  state.board[c][c] = CELL.DOT;
+
+  placeRandomBlockers(level.randomBlockers);
+  renderBoard();
+}
+
+function placeRandomBlockers(count) {
+  let placed = 0;
+
+  while (placed < count) {
+    const r = Math.floor(Math.random() * state.size);
+    const c = Math.floor(Math.random() * state.size);
+    if (state.board[r][c] === CELL.EMPTY && !(r === state.dot.row && c === state.dot.col)) {
+      state.board[r][c] = CELL.BLOCKED;
+      placed++;
+    }
+  }
+}
+
+function renderBoard() {
+  boardEl.innerHTML = "";
+  const size = state.size;
+  const radius = 17;
+  const gap = 5;
+  const xStep = radius * 2 + gap;
+  const yStep = Math.sqrt(3) * radius + gap;
+  const margin = radius + 8;
+
+  const totalWidth = margin * 2 + (size - 1) * xStep + radius;
+  const totalHeight = margin * 2 + (size - 1) * yStep + radius;
+  boardEl.setAttribute("viewBox", `0 0 ${totalWidth} ${totalHeight}`);
+
+  for (let r = 0; r < size; r++) {
+    for (let c = 0; c < size; c++) {
+      const cx = margin + c * xStep + (r % 2 ? xStep / 2 : 0);
+      const cy = margin + r * yStep;
+
+      const circ = document.createElementNS(SVG_NS, "circle");
+      circ.setAttribute("cx", cx);
+      circ.setAttribute("cy", cy);
+      circ.setAttribute("r", radius);
+      circ.dataset.row = r;
+      circ.dataset.col = c;
+      circ.classList.add("cell");
+
+      const cell = state.board[r][c];
+      if (cell === CELL.BLOCKED) circ.classList.add("blocker");
+      if (cell === CELL.DOT) circ.classList.add("dot");
+
+      boardEl.appendChild(circ);
+    }
+  }
+}
+
+boardEl.addEventListener("click", e => {
+  if (!e.target.classList.contains("cell")) return;
+  const r = Number(e.target.dataset.row);
+  const c = Number(e.target.dataset.col);
+  if (state.board[r][c] !== CELL.EMPTY) return;
+
+  state.board[r][c] = CELL.BLOCKED;
+  renderBoard();
+});
+
+/* ------------------------  UI LOGIC ------------------------ */
+
+function renderLevelButtons() {
+  levelPickerEl.innerHTML = "";
+  for (let i = 0; i < LEVELS.length; i++) {
+    const btn = document.createElement("button");
+    btn.className = "level-chip";
+    if (i === state.selectedLevelIndex) btn.classList.add("active");
+    btn.textContent = "Level " + (i + 1);
+    btn.dataset.level = i;
+    levelPickerEl.appendChild(btn);
+  }
+}
+
+modePickerEl.addEventListener("click", e => {
+  const chip = e.target.closest(".mode-chip");
+  if (!chip) return;
+  modePickerEl.querySelectorAll(".mode-chip").forEach(c => c.classList.remove("active"));
+  chip.classList.add("active");
+  state.selectedMode = chip.dataset.mode;
+});
+
+levelPickerEl.addEventListener("click", e => {
+  const chip = e.target.closest(".level-chip");
+  if (!chip) return;
+  levelPickerEl.querySelectorAll(".level-chip").forEach(c => c.classList.remove("active"));
+  chip.classList.add("active");
+  state.selectedLevelIndex = Number(chip.dataset.level);
+});
+
+goToInstructionsBtn.addEventListener("click", () => {
+  instructionListEl.innerHTML = "";
+  [
+    "Click circles to place blockers.",
+    "Dot moves after your move.",
+    "Trap it before it reaches the edge."
+  ].forEach(t => {
+    const li = document.createElement("li");
+    li.textContent = t;
+    instructionListEl.appendChild(li);
+  });
+  instructionHintEl.textContent = HINTS[state.selectedLevelIndex];
+  showScreen("instructions");
+});
+
+startGameBtn.addEventListener("click", () => {
+  setupLevel(state.selectedLevelIndex);
+  showScreen("game");
+});
+
+restartLevelBtn.addEventListener("click", () => {
+  setupLevel(state.levelIndex);
+});
+
+nextLevelBtn.addEventListener("click", () => {
+  if (state.levelIndex < LEVELS.length - 1) {
+    state.levelIndex++;
+    setupLevel(state.levelIndex);
+  }
+});
+
+menuBtn.addEventListener("click", () => {
+  showScreen("start");
+});
+
+renderLevelButtons();
+
+/* -------------------------------------------------------------
+   🌌 Background Stars
+--------------------------------------------------------------*/
+function initBackgroundCanvas() {
+  const canvas = document.getElementById("bgCanvas");
+  const ctx = canvas.getContext("2d");
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const stars = Array.from({ length: 80 }, () => ({
+    x: Math.random() * innerWidth,
+    y: Math.random() * innerHeight,
+    r: Math.random() * 2 + 0.4,
+    speed: Math.random() * 0.4 + 0.1
+  }));
+
+  function animate() {
+    ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const s of stars) {
+      s.y += s.speed;
+      if (s.y > innerHeight) s.y = 0;
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(255,255,255,0.7)";
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    requestAnimationFrame(animate);
+  }
+
+  animate();
+}
+
+initBackgroundCanvas();
+</script>
+
+</body>
+</html>

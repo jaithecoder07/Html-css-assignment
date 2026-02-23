@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebDesignPro - Creative Solutions</title>
+
+  <style>
+/* ===== RESET ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  color: #333;
+  background: #fafafa;
+  line-height: 1.6;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: #ffffff;
+  padding: 18px 10%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.04);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-weight: 700;
+  font-size: 26px;
+  color: #5a4b81;
+  letter-spacing: -0.5px;
+}
+
+nav a {
+  margin: 0 15px;
+  text-decoration: none;
+  color: #666;
+  font-size: 14px;
+  transition: 0.3s ease;
+}
+
+nav a:hover {
+  color: #6c5ce7;
+}
+
+.btn-quote {
+  background: #6c5ce7;
+  color: #fff;
+  padding: 8px 22px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.btn-quote:hover {
+  background: #5947d9;
+}
+
+/* ===== HERO SECTION ===== */
+.hero {
+  padding: 70px 10%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #7b73ff, #a29bfe);
+  color: white;
+}
+
+.hero-text h1 {
+  font-size: 46px;
+  font-weight: 700;
+}
+
+.hero-text p {
+  font-size: 18px;
+  margin-top: 10px;
+  opacity: 0.9;
+}
+
+.hero .btn-quote {
+  background: #fff;
+  color: #6c5ce7;
+  font-weight: 600;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.hero .btn-quote:hover {
+  background: #f8f8f8;
+}
+
+.hero-image img {
+  width: 95%;
+  border-radius: 12px;
+  box-shadow: 0 20px 35px rgba(0,0,0,0.15);
+  transition: 0.3s ease;
+}
+
+.hero-image img:hover {
+  transform: translateY(-5px);
+}
+
+/* ===== SERVICES ===== */
+.services {
+  display: flex;
+  justify-content: space-between;
+  padding: 60px 10%;
+  background: #ffffff;
+}
+
+.service-card {
+  flex: 1;
+  padding: 25px;
+  background: #fff;
+  margin: 0 10px;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+  transition: 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.service-card span {
+  font-size: 30px;
+}
+
+.service-card h3 {
+  font-size: 20px;
+  margin-top: 10px;
+  color: #5a4b81;
+}
+
+.service-card p {
+  font-size: 14px;
+  color: #777;
+  margin-top: 8px;
+}
+
+/* ===== ABOUT SECTION ===== */
+.about {
+  display: flex;
+  padding: 70px 10%;
+  align-items: center;
+  background: #fdfdfd;
+}
+
+.about-text {
+  flex: 1;
+  padding-right: 40px;
+}
+
+.about-text h2 {
+  font-size: 32px;
+  margin-bottom: 15px;
+  color: #5a4b81;
+}
+
+.about-text p {
+  font-size: 16px;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.about-image img {
+  width: 90%;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+/* ===== PROJECTS ===== */
+.projects {
+  padding: 70px 10%;
+  background: #f5f5ff;
+  text-align: center;
+}
+
+.projects h2 {
+  color: #5a4b81;
+  font-size: 32px;
+}
+
+.project-grid {
+  display: flex;
+  gap: 25px;
+  margin-top: 40px;
+}
+
+.project-item {
+  background: #fff;
+  padding: 15px;
+  border-radius: 12px;
+  flex: 1;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.06);
+  transition: 0.3s ease;
+}
+
+.project-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+.project-item img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+/* ===== FOOTER ===== */
+footer {
+  background: #4b4276;
+  color: #dcdcdc;
+  padding: 25px 10%;
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+footer div:last-child {
+  opacity: 0.8;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media (max-width: 900px) {
+  .hero, .about {
+    flex-direction: column;
+    text-align: center;
+  }
+  .hero-image img, 
+  .about-image img {
+    width: 100%;
+    margin-top: 20px;
+  }
+  .services {
+    flex-direction: column;
+  }
+  .service-card {
+    margin: 15px 0;
+  }
+  .project-grid {
+    flex-direction: column;
+  }
+}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">▼ WebDesignPro</div>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#">Services</a>
+    <a href="#">About</a>
+    <a href="#">Contact</a>
+    <a href="#" class="btn-quote">Get a Quote</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-text">
+    <h1>Creative Web Design Solutions</h1>
+    <p>Building Modern and Responsive Websites</p>
+    <br>
+    <a href="#" class="btn-quote" style="background: #fff; color: #6c5ce7;">Get Started</a>
+  </div>
+  <div class="hero-image">
+    <img src="https://via.placeholder.com/400x250/5a4b81/ffffff?text=Interface+Graphic" alt="Web Preview">
+  </div>
+</section>
+
+<section class="services">
+  <div class="service-card">
+    <span>🖥️</span>
+    <h3>Web Design</h3>
+    <p>Creative and responsive designs</p>
+  </div>
+  <div class="service-card">
+    <span>⚙️</span>
+    <h3>Development</h3>
+    <p>Robust and scalable solutions</p>
+  </div>
+  <div class="service-card">
+    <span>📈</span>
+    <h3>SEO Optimization</h3>
+    <p>Improve your search rankings</p>
+  </div>
+</section>
+
+<section class="about">
+  <div class="about-text">
+    <h2>About Us</h2>
+    <p>Professional web design and development services to help your business grow. We focus on results and user experience.</p>
+    <a href="#" class="btn-quote">Learn More</a>
+  </div>
+  <div class="about-image">
+    <img src="https://via.placeholder.com/500x300/e0e0e0/666666?text=Office+Workspace" alt="About Image">
+  </div>
+</section>
+
+<section class="projects">
+  <h2>Our Recent Projects</h2>
+  <div class="project-grid">
+    <div class="project-item">
+      <img src="https://via.placeholder.com/300x180/ddd/333?text=E-Commerce+Site" alt="Project 1">
+      <p>E-Commerce Site</p>
+    </div>
+    <div class="project-item">
+      <img src="https://via.placeholder.com/300x180/ddd/333?text=Portfolio+Website" alt="Project 2">
+      <p>Portfolio Website</p>
+    </div>
+    <div class="project-item">
+      <img src="https://via.placeholder.com/300x180/ddd/333?text=Business+Landing+Page" alt="Project 3">
+      <p>Business Landing Page</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>©️ 2024 WebDesignPro. All rights reserved.</div>
+  <div>Follow us: [f] [t] [i]</div>
+</footer>
+
+</body>
+</html>
